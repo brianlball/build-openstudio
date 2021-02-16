@@ -11,8 +11,8 @@ RUN apt-get update && apt-get install -y \
   libssl-dev \
   libicu-dev \
   ninja-build \
-  python3-dev \
-  python3-pip \ 
+  python3.7-dev \
+  python3-pip \
   sudo \
   wget \
   bsdtar \
@@ -21,8 +21,13 @@ RUN apt-get update && apt-get install -y \
 RUN apt-add-repository ppa:brightbox/ruby-ng && \
     apt-get update && \
     apt-get install -y ruby2.5 ruby2.5-dev
-	
-RUN pip3 install conan
+
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
+RUN update-alternatives --set python /usr/bin/python3.7
+RUN ln -s /usr/bin/pip3 /usr/bin/pip
+RUN python -m pip install --upgrade pip
+RUN pip install conan setuptools wheel twine requests packaging
+#RUN pip3 install conan
 
 ARG CMAKE_VERSION=3.17.1
 RUN cd /usr/local/src/ && \
@@ -35,15 +40,21 @@ RUN cd /usr/local/src/ && \
 	make install && \
 	ln -s /usr/local/bin/cmake /usr/bin/cmake
 
+#use branch python_measure 
 RUN cd /usr/local/src && \
     mkdir openstudio && \
 	cd openstudio && \
     git clone https://github.com/NREL/OpenStudio.git . && \
-	git checkout pmeasure && \
+	git checkout python-measure && \
 	mkdir build && \
 	cd build && \
-	cmake -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DBUILD_PACKAGE=ON -DCPACK_BINARY_IFW=OFF -DCPACK_BINARY_NSIS=OFF -DCPACK_BINARY_RPM=OFF -DCPACK_BINARY_STGZ=OFF -DCPACK_BINARY_TBZ2=OFF -DCPACK_BINARY_TXZ=OFF -DCPACK_BINARY_TZ=OFF -DCPACK_BINARY_TGZ=OFF -DCPACK_BINARY_DEB=ON -DCPACK_SOURCE_RPM=OFF -DCPACK_SOURCE_TBZ2=OFF -DCPACK_SOURCE_TGZ=OFF -DCPACK_SOURCE_TXZ=OFF -DCPACK_SOURCE_TZ=OFF -DCPACK_SOURCE_ZIP=OFF ../. && \
-	ninja && \
-	ninja package
+	cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DCPACK_BINARY_DEB=ON -DCPACK_SOURCE_ZIP=OFF -DBUILD_PYTHON_BINDINGS=ON -DBUILD_PYTHON_PIP_PACKAGE=ON -DBUILD_TESTING=OFF -DBUILD_RUBY_BINDINGS=ON -DBUILD_CLI=ON ../.
+RUN cd /usr/local/src/openstudio/build && \
+	ninja; exit 0 && \
+    ninja
+RUN cd /usr/local/src/openstudio/build && \
+    ninja; exit 0
+#	ninja package && \
+#    ninja_python_package
 	
 CMD [ "/bin/bash" ]
