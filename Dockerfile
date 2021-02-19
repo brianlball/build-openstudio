@@ -45,15 +45,16 @@ RUN cd /usr/local/src && \
     mkdir openstudio && \
 	cd openstudio && \
     git clone https://github.com/NREL/OpenStudio.git . && \
-	git checkout python-measure && \
+	git checkout python-measure-dynamic && \
 	mkdir build && \
-	cd build && \
-	cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DCPACK_BINARY_DEB=ON -DCPACK_SOURCE_ZIP=OFF -DBUILD_PYTHON_BINDINGS=ON -DBUILD_PYTHON_PIP_PACKAGE=ON -DBUILD_TESTING=OFF -DBUILD_RUBY_BINDINGS=ON -DBUILD_CLI=ON ../.
-RUN cd /usr/local/src/openstudio/build && \
-	ninja; exit 0 && \
-    ninja
-RUN cd /usr/local/src/openstudio/build && \
-    ninja; exit 0
+	cd build
+#	cmake -G Ninja -DDYNAMIC_OPENSTUDIO=ON -DCMAKE_BUILD_TYPE=Release -DCPACK_BINARY_DEB=ON -DCPACK_SOURCE_ZIP=OFF -DBUILD_PYTHON_BINDINGS=ON -DBUILD_PYTHON_PIP_PACKAGE=ON -DBUILD_TESTING=OFF -DBUILD_RUBY_BINDINGS=ON -DBUILD_CLI=ON ../.
+#RUN cd /usr/local/src/openstudio/build && \
+#	ninja; exit 0 && \
+#    ninja; exit 0 && \
+#    ninja
+#RUN cd /usr/local/src/openstudio/build && \
+#    ninja; exit 0
 #	ninja package && \
 #    ninja_python_package
 	
